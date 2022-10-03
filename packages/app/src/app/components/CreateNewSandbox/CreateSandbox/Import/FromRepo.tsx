@@ -20,12 +20,16 @@ export const FromRepo: React.FC<{ githubRepo: GithubRepoToImport }> = ({
 }) => {
   const { activeTeamInfo } = useAppState();
   const githubOrganizations = useGithubOrganizations();
+  const organizationStatesRef = React.useRef(githubOrganizations.state);
 
   const [repoName, setRepoName] = useState<string>(githubRepo.name);
   const [selectedTeam, setSelectedTeam] = useState<string>('');
 
   React.useEffect(() => {
-    if (githubOrganizations.state === 'ready') {
+    if (
+      githubOrganizations.state === 'ready' &&
+      organizationStatesRef.current === 'loading'
+    ) {
       setSelectedTeam(
         getGihubOrgMatchingCsbTeam(
           activeTeamInfo.name,
@@ -33,6 +37,8 @@ export const FromRepo: React.FC<{ githubRepo: GithubRepoToImport }> = ({
         ).login
       );
     }
+
+    organizationStatesRef.current = githubOrganizations.state;
   }, [activeTeamInfo, githubOrganizations]);
 
   return (
