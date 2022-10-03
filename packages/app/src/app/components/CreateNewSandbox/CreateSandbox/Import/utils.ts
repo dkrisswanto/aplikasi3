@@ -1,3 +1,6 @@
+import { findBestMatch } from 'string-similarity';
+import { GithubOrganizations } from './types';
+
 export const getOwnerAndNameFromInput = (githubUrl: string) => {
   const match = githubUrl.match(
     // eslint-disable-next-line no-useless-escape
@@ -11,4 +14,15 @@ export const getOwnerAndNameFromInput = (githubUrl: string) => {
   const nameParts = name?.split('/') || [];
 
   return { owner, name: nameParts[0] };
+};
+
+export const getGihubOrgMatchingCsbTeam = (
+  teamName: string,
+  orgs: GithubOrganizations
+) => {
+  const match = findBestMatch(
+    teamName,
+    orgs.map(org => org.login)
+  );
+  return orgs.find(org => org.login === match.bestMatch.target) || orgs[0];
 };

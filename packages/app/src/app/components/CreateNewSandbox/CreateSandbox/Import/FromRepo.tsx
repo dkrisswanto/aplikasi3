@@ -12,14 +12,28 @@ import {
 import { CloudBetaBadge } from 'app/components/CloudBetaBadge';
 import { GithubRepoToImport } from './types';
 import { StyledSelect } from '../elements';
+import { useGithubOrganizations } from './useGithubOrganizations';
+import { getGihubOrgMatchingCsbTeam } from './utils';
 
 export const FromRepo: React.FC<{ githubRepo: GithubRepoToImport }> = ({
   githubRepo,
 }) => {
-  const { user, dashboard, activeTeam } = useAppState();
+  const { activeTeamInfo } = useAppState();
+  const githubOrganizations = useGithubOrganizations();
 
   const [repoName, setRepoName] = useState<string>(githubRepo.name);
-  const [selectedTeam, setSelectedTeam] = useState<string>(activeTeam);
+  const [selectedTeam, setSelectedTeam] = useState<string>('');
+
+  React.useEffect(() => {
+    if (githubOrganizations.state === 'ready') {
+      setSelectedTeam(
+        getGihubOrgMatchingCsbTeam(
+          activeTeamInfo.name,
+          githubOrganizations.data
+        ).login
+      );
+    }
+  }, [activeTeamInfo, githubOrganizations]);
 
   return (
     <Stack
@@ -83,7 +97,7 @@ export const FromRepo: React.FC<{ githubRepo: GithubRepoToImport }> = ({
 
           <Label css={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             <Text as="span" size={2} css={{ color: '#808080' }}>
-              Git organization
+              GitHub organization
             </Text>
             <StyledSelect
               css={{
@@ -94,11 +108,14 @@ export const FromRepo: React.FC<{ githubRepo: GithubRepoToImport }> = ({
                 setSelectedTeam(e.target.value);
               }}
               value={selectedTeam}
-              disabled={!user || !dashboard.teams}
+              disabled={githubOrganizations.state !== 'ready'}
             >
-              {dashboard.teams.map(team => (
-                <option key={team.id}>{team.name}</option>
-              ))}
+              {githubOrganizations.state === 'ready' &&
+                githubOrganizations.data.map(org => (
+                  <option key={org.id} value={org.login}>
+                    {org.login}
+                  </option>
+                ))}
             </StyledSelect>
           </Label>
         </Stack>

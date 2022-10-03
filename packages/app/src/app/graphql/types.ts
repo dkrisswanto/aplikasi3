@@ -240,7 +240,7 @@ export type CurrentUserNotificationsArgs = {
 };
 
 export type CurrentUserRecentBranchesArgs = {
-  contribution?: Maybe<Scalars['Boolean']>;
+  contribution: Maybe<Scalars['Boolean']>;
   limit?: Maybe<Scalars['Int']>;
 };
 
@@ -579,6 +579,8 @@ export type ProSubscription = {
   paymentProvider: Maybe<SubscriptionPaymentProvider>;
   quantity: Maybe<Scalars['Int']>;
   status: SubscriptionStatus;
+  trialEnd: Maybe<Scalars['DateTime']>;
+  trialStart: Maybe<Scalars['DateTime']>;
   type: SubscriptionType;
   unitPrice: Maybe<Scalars['Int']>;
   updateBillingUrl: Maybe<Scalars['String']>;
@@ -1341,8 +1343,10 @@ export type Sandbox = {
   isFrozen: Scalars['Boolean'];
   isSse: Maybe<Scalars['Boolean']>;
   isV2: Scalars['Boolean'];
+  /** Depending on the context, this may be the last access of the current user or the aggregate last access for all users */
+  lastAccessedAt: Scalars['DateTime'];
   likeCount: Scalars['Int'];
-  /** If the sandbox has been forked from a git sandbox this will be set */
+  /** If the sandbox has been made into a git sandbox, then this will be set */
   originalGit: Maybe<Git>;
   permissions: Maybe<SandboxProtectionSettings>;
   /** If a PR has been opened on the sandbox, this will be set to the PR number */
@@ -1669,6 +1673,28 @@ export type GetGithubRepoQuery = { __typename?: 'RootQueryType' } & {
           'id' | 'login' | 'avatarUrl'
         >;
       }
+  >;
+};
+
+export type GetGithubOrganizationsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetGithubOrganizationsQuery = { __typename?: 'RootQueryType' } & {
+  me: Maybe<
+    { __typename?: 'CurrentUser' } & {
+      githubProfile: Maybe<
+        { __typename?: 'GithubProfile' } & Pick<GithubProfile, 'id' | 'login'>
+      >;
+      githubOrganizations: Maybe<
+        Array<
+          { __typename?: 'GithubOrganization' } & Pick<
+            GithubOrganization,
+            'id' | 'login'
+          >
+        >
+      >;
+    }
   >;
 };
 

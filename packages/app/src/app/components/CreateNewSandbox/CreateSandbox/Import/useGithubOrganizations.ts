@@ -1,0 +1,42 @@
+import { useQuery } from '@apollo/react-hooks';
+import {
+  GetGithubOrganizationsQuery,
+  GetGithubOrganizationsQueryVariables,
+} from 'app/graphql/types';
+import { GET_GITHUB_ORGANIZATIONS } from '../../queries';
+import { GithubOrganizations } from './types';
+
+export type State =
+  | { state: 'loading' }
+  | {
+      state: 'ready';
+      data: GithubOrganizations;
+    }
+  | {
+      state: 'error';
+      error: string;
+    };
+export const useGithubOrganizations = (): State => {
+  const { data, error } = useQuery<
+    GetGithubOrganizationsQuery,
+    GetGithubOrganizationsQueryVariables
+  >(GET_GITHUB_ORGANIZATIONS, {});
+
+  if (error) {
+    return {
+      state: 'error',
+      error: error.message,
+    };
+  }
+
+  if (typeof data?.me === 'undefined') {
+    return {
+      state: 'loading',
+    };
+  }
+
+  return {
+    state: 'ready',
+    data: [data.me.githubProfile, ...data.me.githubOrganizations],
+  };
+};
