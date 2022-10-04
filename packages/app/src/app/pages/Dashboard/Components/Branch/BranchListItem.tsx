@@ -17,9 +17,12 @@ export const BranchListItem = ({
   branch,
   branchUrl,
   onContextMenu,
+  selected,
+  ...props
 }: BranchProps) => {
   const { name: branchName, project, contribution } = branch;
   const { repository } = project;
+
   return (
     <ListAction
       align="center"
@@ -29,10 +32,11 @@ export const BranchListItem = ({
         borderBottom: '1px solid',
         borderBottomColor: 'grays.600',
         overflow: 'hidden',
-        backgroundColor: 'transparent',
-        color: 'inherit',
+        backgroundColor: selected ? 'purpleOpaque' : 'transparent',
+        color: selected ? 'white' : 'inherit',
         ':hover, :focus, :focus-within': {
-          backgroundColor: 'list.hoverBackground',
+          cursor: 'default',
+          backgroundColor: selected ? 'purpleOpaque' : 'list.hoverBackground',
         },
       })}
     >
@@ -47,10 +51,11 @@ export const BranchListItem = ({
         }}
         href={branchUrl}
         onContextMenu={onContextMenu}
+        {...props}
       >
         <Grid css={{ width: 'calc(100% - 26px - 8px)' }}>
           <Column
-           span={[12, 5, 5]}
+            span={[12, 5, 5]}
             css={{
               display: 'block',
               overflow: 'hidden',
@@ -60,7 +65,12 @@ export const BranchListItem = ({
           >
             <Stack gap={4} align="center" marginLeft={2}>
               {contribution ? (
-                <Icon color="#EDFFA5" name="contribution" size={16} width="32px" />
+                <Icon
+                  color="#EDFFA5"
+                  name="contribution"
+                  size={16}
+                  width="32px"
+                />
               ) : (
                 <Icon name="branch" color="#999" size={16} width="32px" />
               )}
